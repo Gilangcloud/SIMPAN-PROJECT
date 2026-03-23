@@ -1,0 +1,79 @@
+from datetime import datetime, date
+from barang import Barang
+from habis_pakai import BarangHabisPakai
+from mixin import LogMixin, ValidasiMixin
+
+class ManageSIMPAN(LogMixin, ValidasiMixin):
+    def __init__(self, nama_instansi:str ):
+        self.__nama_instansi = nama_instansi
+        self.__daftar_barang = []
+    
+    @property
+    def nama_instansi(self):return self.__nama_instansi
+
+    @property
+    def jumlah_barang(self):return len(self.__daftar_barang)
+
+    def tambah_barang(self, barang:Barang):
+        if self.cari_id(barang.id_barang):
+            raise ValueError(f"ID {barang.id_barang} Sudah Ada")
+        self.__daftar_barang.append(barang)
+        self.log_aktivitas("TAMBAH BARANG", f"{barang.kategori()} | {barang.nama}")
+
+    def hapus_barang(self, id_barang: str):
+        barang = self.cari_id(id_barang)
+        if not barang:
+            raise ValueError(f"ID '{id_barang}' tidak ditemukan!")
+        self.__daftar_barang.remove(barang)
+        self.log_aktivitas("HAPUS BARANG", f"{barang.nama}")
+    
+    def ubah_harga(self, id_barang: str, harga_baru: float):
+        barang = self.cari_id(id_barang)
+        if not barang:
+            raise ValueError(f"ID '{id_barang}' tidak ditemukan!")
+        harga_lama = barang.harga
+        barang.harga = harga_baru
+        self.log_aktivitas("UBAH HARGA", f"{barang.nama} Rp{harga_lama:,.0f} → Rp{harga_baru:,.0f}")
+    
+    def cari_id(self, id_barang: str):
+        for b in self.__daftar_barang:
+            if b.id_barang == id_barang:
+                return b
+        return None
+    
+    def cari_nama(self, keyword: str):
+        return [b for b in self.__daftar_barang
+                if keyword.lower() in b.nama.lower()]
+    
+    def filter_kategori(self, kategori: str):
+        return [b for b in self.__daftar_barang
+                if b.kategori() == kategori]
+    
+    def tampilkan_semua(self):
+        print(f"\n{'='*60}")
+        print(f"  SIMPAN — {self.__nama_instansi}")
+        print(f"{'='*60}")
+        if not self.__daftar_barang:
+            print("  (Belum ada barang)")
+        for b in self.__daftar_barang:
+            print(f"  {b.info_detail()}")
+        print(f"{'='*60}")
+        print(f"  Total barang : {self.jumlah_barang}")
+        print(f"  Total nilai  : Rp{self.total_nilai():,.0f}")
+        print(f"{'='*60}\n")
+    
+    def total_nilai(self):
+        return sum(b.hitung_nilai() for b in self.__daftar_barang)
+    
+    def laporan_per_kategori(self):
+        print(f"\n{'='*60}")
+        print(f"  LAPORAN PER KATEGORI — {self.__nama_instansi}")
+        print(f"{'='*60}")
+        kategori_list = set(b.kategori() for b in self.__daftar_barang)
+        for kat in sorted(kategori_list):
+            items = self.filter_kategori(kat)
+            nilai = sum(b.hitung_nilai() for b in items)
+            print(f"  {kat:20s} : {len(items):3d} barang | Rp{nilai:,.0f}")
+        print(f"{'─'*60}")
+        print(f"  {'TOTAL':20s} : {self.jumlah_barang:3d} barang | Rp{self.total_nilai():,.0f}")
+        print(f"{'='*60}\n")
