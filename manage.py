@@ -2,8 +2,9 @@ from datetime import datetime, date
 from barang import Barang
 from habis_pakai import BarangHabisPakai
 from mixin import LogMixin, ValidasiMixin
+from export_mixin import ExportMixin
 
-class ManageSIMPAN(LogMixin, ValidasiMixin):
+class ManageSIMPAN(LogMixin, ValidasiMixin, ExportMixin ):
     def __init__(self, nama_instansi:str ):
         self.__nama_instansi = nama_instansi
         self.__daftar_barang = []
@@ -77,3 +78,19 @@ class ManageSIMPAN(LogMixin, ValidasiMixin):
         print(f"{'─'*60}")
         print(f"  {'TOTAL':20s} : {self.jumlah_barang:3d} barang | Rp{self.total_nilai():,.0f}")
         print(f"{'='*60}\n")
+
+    def _get_export_data(self):
+        """Implementasi method untuk ExportMixin"""
+        headers = ["ID", "Nama", "Kategori", "Harga (Rp)", "Stok", "Nilai Total (Rp)", "Detail"]
+        rows = []
+        for barang in self.__daftar_barang:
+            detail = ""
+            if barang.kategori() == "Elektronik":
+                detail = f"{barang.merek} | Garansi {barang.garansi_bulan} bln"
+            elif barang.kategori() == "Habis Pakai":
+                status = "KADALUARSA" if barang.sudah_kadaluarsa() else "Baik"
+                detail = f"{barang.satuan} | Exp: {barang.tgl_kadaluarsa} | {status}"
+            elif barang.kategori() == "Aset Tetap":
+                detail = f"Tahun {barang.tahun_beli} | Umur {barang.umur_aset()} thn | {barang.kondisi}"
+            rows.append([barang.id_barang, barang.nama, barang.kategori(), barang.harga, barang.stok, barang.hitung_nilai(), detail])
+        return {'title': f'Laporan Inventori - {self.__nama_instansi}', 'headers': headers, 'rows': rows, 'currency_columns': [4, 6]}
