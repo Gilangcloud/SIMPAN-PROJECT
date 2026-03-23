@@ -12,6 +12,7 @@ def main():
     m.tambah_barang(BarangAsetTetap("A001", "Mesin Fotokopi", 15_000_000, 2, 2020, "Baik"))
 
     m.tampilkan_semua()
+    m.tampilkan_pringatan_kadaluarsa(7)
     m.laporan_per_kategori()
 
     m.ubah_harga("E001", 7_999_000)

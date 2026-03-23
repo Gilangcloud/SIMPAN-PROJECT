@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from barang import Barang
 from habis_pakai import BarangHabisPakai
 from mixin import LogMixin, ValidasiMixin
@@ -94,3 +94,31 @@ class ManageSIMPAN(LogMixin, ValidasiMixin, ExportMixin ):
                 detail = f"Tahun {barang.tahun_beli} | Umur {barang.umur_aset()} thn | {barang.kondisi}"
             rows.append([barang.id_barang, barang.nama, barang.kategori(), barang.harga, barang.stok, barang.hitung_nilai(), detail])
         return {'title': f'Laporan Inventori - {self.__nama_instansi}', 'headers': headers, 'rows': rows, 'currency_columns': [4, 6]}
+    
+    def filter_kadaluarsa(self, sisa_hari=0):
+        hasil = []
+        target_tanggal = date.today() + timedelta(days=sisa_hari)
+
+        for b in self.__daftar_barang:
+            if isinstance(b, BarangHabisPakai):
+                tgl_exp = date.fromisoformat(b.tgl_kadaluarsa)
+                if tgl_exp <= target_tanggal:
+                    hasil.append(b)
+
+        return hasil
+    
+    def tampilkan_pringatan_kadaluarsa(self, hari_peringatan=7):
+        print(f"\n{'!'* 60}")
+        print(f"PERINGATAN KADALUARSA (H-{hari_peringatan})")
+        print(f"{'!'* 60}")
+
+        barang_beresiko = self.filter_kadaluarsa(hari_peringatan)
+
+        if not barang_beresiko:
+            print("(Aman : Tidak ada barang yang mendekati masa kadaluarsa)")
+        else:
+            for b in barang_beresiko:
+                status = "SUDAH EXP" if b.sudah_kadaluarsa() else "AKAN EXP"
+                print(f" {status} | {b.id_barang} | {b.nama} |Exp:{b.tgl_kadaluarsa}")
+
+        print(f"{'!'*60}\n")
