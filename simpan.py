@@ -16,5 +16,10 @@ def main():
 
     m.ubah_harga("E001", 7_999_000)
 
+    try:
+        excel_file = m.export_to_excel()
+    except Exception as e:
+        print(f"Error saat export: {e}")
+
 if __name__ == "__main__":
     main()
