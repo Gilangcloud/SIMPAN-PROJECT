@@ -27,5 +27,35 @@ def main():
     except Exception as e:
         print(f"Error saat export: {e}")
 
+    # Test cek stok menipis
+    print("\nCek stok menipis (batas 10):")
+    try:
+        m.cek_stok_menipis(10)
+    except Exception as e:
+        print(f"Error saat cek stok menipis: {e}")
+
+    # Test validasi barang dengan data benar
+    print("\nTest validasi barang baru:")
+    try:
+        barang_valid = BarangElektronik("E003", "Monitor LG", 3_000_000, 8, "LG", 12)
+        m.validasi_barang(barang_valid)
+        print("Barang valid berhasil dicek.")
+    except Exception as e:
+        print(f"Error validasi barang: {e}")
+
+    print("\nTest validasi barang kode duplikat:")
+    try:
+        barang_duplikat = BarangElektronik("E001", "Laptop HP", 9_000_000, 5, "HP", 24)
+        m.validasi_barang(barang_duplikat)
+    except Exception as e:
+        print(f"Validasi berhasil mendeteksi error: {e}")
+
+    print("\nTest validasi stok tidak valid:")
+    try:
+        barang_stok_salah = BarangElektronik("E004", "Mouse Logitech", 150_000, -5, "Logitech", 12)
+        m.validasi_barang(barang_stok_salah)
+    except Exception as e:
+        print(f"Validasi berhasil mendeteksi error: {e}")
+
 if __name__ == "__main__":
     main()

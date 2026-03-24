@@ -140,3 +140,21 @@ class ManageSIMPAN(LogMixin, ValidasiMixin, ExportMixin ):
             print(f"  [{waktu}] {keterangan} : Rp{harga_tercatat:,.0f}")
         
         print(f"{'-'*60}\n")
+
+    def cek_stok_menipis(self, batas_minimal=5):
+        menipis = [b for b in self.__daftar_barang if b.stok <= batas_minimal]
+        print(f"\n{'='*60}")
+        print(f"  ⚠ STOK MENIPIS (batas: {batas_minimal})")
+        print(f"{'='*60}")
+        if not menipis:
+            print("  Semua stok aman!")
+        for b in menipis:
+            print(f"  ⚠ {b.id_barang} | {b.nama} | Stok: {b.stok}")
+        print(f"{'='*60}\n")
+
+    def validasi_barang(self, barang):
+       if barang.stok < 0:
+        raise ValueError(f"Stok {barang.nama} tidak boleh negatif")
+       if barang.harga <= 0:
+        raise ValueError(f"Harga {barang.nama} harus lebih dari 0")
+       print(f"{barang.nama} valid ✅")
