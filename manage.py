@@ -122,3 +122,21 @@ class ManageSIMPAN(LogMixin, ValidasiMixin, ExportMixin ):
                 print(f" {status} | {b.id_barang} | {b.nama} |Exp:{b.tgl_kadaluarsa}")
 
         print(f"{'!'*60}\n")
+
+    def tampilkan_riwayat_harga(self, id_barang: str):
+        barang = self.cari_id(id_barang)
+        if not barang:
+            print(f"\n Gagal : ID '{id_barang}' tidak di temukan!")
+            return
+        
+        print(f"\n{'-'* 60}")
+        print(f" Riwayat Harga : {id_barang} ({barang.nama})")
+        print(f"\n{'-'* 60}")
+
+        riwayat = barang.riwayat_harga
+        for i, record in enumerate(riwayat):
+            waktu, harga_tercatat = record
+            keterangan = "Harga Awal     " if i == 0 else "Perubahan Harga"
+            print(f"  [{waktu}] {keterangan} : Rp{harga_tercatat:,.0f}")
+        
+        print(f"{'-'*60}\n")

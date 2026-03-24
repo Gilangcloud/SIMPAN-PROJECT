@@ -9,6 +9,7 @@ class Barang(ABC, LogMixin, ValidasiMixin):
         self.__harga = harga
         self.__stok = stok
         self.__tgl_masuk = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.__riwayat_harga = [(self.__tgl_masuk, harga)]
     
     @property
     def id_barang(self):return self.__id_barang
@@ -25,6 +26,10 @@ class Barang(ABC, LogMixin, ValidasiMixin):
     @property
     def tgl_masuk(self):return self.__tgl_masuk
 
+    @property
+    def riwayat_harga(self):
+        return self.__riwayat_harga.copy()
+
     @nama.setter
     def nama(self, nilai:str):
         if not self.validasi_nama(nilai):
@@ -36,6 +41,9 @@ class Barang(ABC, LogMixin, ValidasiMixin):
         if not self.validasi_harga(nilai):
             raise ValueError("Harga harus Lebih Dari 0 ")
         self.__harga= nilai
+
+        waktu_ubah = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.__riwayat_harga.append((waktu_ubah, nilai))
 
     @stok.setter
     def stok(self, nilai:int):

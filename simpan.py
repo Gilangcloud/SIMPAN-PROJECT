@@ -15,8 +15,13 @@ def main():
     m.tampilkan_pringatan_kadaluarsa(7)
     m.laporan_per_kategori()
 
+    print("\nMelakukan perubahan harga...")
     m.ubah_harga("E001", 7_999_000)
+    m.ubah_harga("E001", 7_500_000)
 
+    m.tampilkan_riwayat_harga("E001")
+    m.tampilkan_riwayat_harga("X999")
+    
     try:
         excel_file = m.export_to_excel()
     except Exception as e:
